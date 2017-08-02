@@ -35,7 +35,7 @@ public class Game {
 
 	}
 
-	private static String demandUserInput(String displayString, List<String> possibleChoices, Scanner inScnr) throws InvalidUserInputException{
+	private static String demandUserInput(String displayString, List<String> possibleChoices, Scanner inScnr){
 		for(boolean isInput = false; !isInput;){
 			try{
 				try{
@@ -65,7 +65,7 @@ public class Game {
 				System.out.println(e.getMessage());
 			}
 			catch(Exception e){
-				throw (InvalidUserInputException) e;
+				e.printStackTrace();
 			}
 		}
 		return null;
