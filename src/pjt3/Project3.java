@@ -3,18 +3,21 @@ import java.io.*;
 import java.util.*;
 public class Project3 {
 
+
+	static Scanner sysScnr = new Scanner(System.in);
+	
+	
 	public static void main(String[] args) {
-		
-		final Scanner sysScnr = new Scanner(System.in);
 		Game gamey;
 		try{
-
-			
-			
-			while(!Game.isQuit()){//Repeat
+			while(true){//Repeat
 				gamey = new Game();
 				gamey.reset();
+				gamey.checkContinue();
 			}
+		}
+		catch(QuitGameException e){
+			//TODO Roses are red, violets are blue, I should find something for you to do.
 		}
 		catch(Exception e){	//Capt'n, we have a problem.
 			try{
@@ -37,7 +40,7 @@ public class Project3 {
 				System.exit(0); 
 			}
 		}
-		
+
 	}
 
 }
