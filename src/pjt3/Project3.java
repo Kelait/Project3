@@ -6,10 +6,14 @@ public class Project3 {
 	public static void main(String[] args) {
 		
 		final Scanner sysScnr = new Scanner(System.in);
-
+		Game gamey;
 		try{
-			while(!Game.isQuit()){//Repeat
 
+			
+			
+			while(!Game.isQuit()){//Repeat
+				gamey = new Game();
+				gamey.reset();
 			}
 		}
 		catch(Exception e){	//Capt'n, we have a problem.

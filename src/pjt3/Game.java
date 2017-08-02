@@ -9,11 +9,15 @@ public class Game {
 	private static Random randy;
 
 	private static WordGenerator wordy;
+	
+	public static HashMap<Integer, String> localization = new HashMap<Integer,String>();
+	
 
 	Game() throws Exception{
 		try{
 			randy = new Random(SEED);
-				
+			wordy = new WordGenerator(randy);
+			readInLocalization();
 			initGame();
 			run();
 		}
@@ -71,6 +75,9 @@ public class Game {
 		return null;
 	}
 
+	private static void readInLocalization(){
+		
+	}
 
 	private static void run(){
 		while(!isOver()){
@@ -90,6 +97,10 @@ public class Game {
 	public static boolean isQuit() {
 
 		return false;
+	}
+	public void reset() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
