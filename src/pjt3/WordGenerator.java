@@ -70,4 +70,7 @@ public class WordGenerator{
 	public void cullWordList(/*Probably some args here */){
 		//TODO cull word list based on args.
 	}
+	public String chooseWord() {
+		return words.get(wordRand.nextInt(words.size()));
+	}
 }

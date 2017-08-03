@@ -26,15 +26,21 @@ public class Game {
 	//Shouldn't change honestly, would need more language support if language were to change.
 	private static String curLanguage = "eng";
 
-
+	//Global game vars.
 	private static boolean aiGuesser;
+	private static boolean aiChooser;
 
-	//Vars for output display.
+	private static String aiChosenWord;
+	private static int playerChosenWordLength;
+
+	private static int numTurns;	
+
+	//Vars for output display and gameplay.
 	private static int curWordLength;
 	private static int curLives;
 	private static char curCharInput;
 
-	//Arrays for output display.
+	//Arrays for output display and gameplay.
 	private static ArrayList<Integer> curGuessPositions = new ArrayList<Integer>();
 	private static ArrayList<Character> curRevealedChars = new ArrayList<Character>(curWordLength);
 	private static ArrayList<Character> curGuessedChars = new ArrayList<Character>(curWordLength);
@@ -76,9 +82,9 @@ public class Game {
 			randy = new Random(SEED);
 			wordy = new WordGenerator(randy);
 			readInLocalization();				
-			displayGameStatus();
 			initGame();
 			run();
+			reset();
 		}
 		catch(IOException e){
 			throw new RuntimeException("Failed to initialize word list.", e);
@@ -99,31 +105,74 @@ public class Game {
 		}
 
 	}
-	private static void initPlayers(){
-
-	}
-
 	private static void initGame(){
 		try{
-			initPlayers();
+			curLives = TOTLIVES;
+
+			checkCG();
+			if(aiChooser){
+				aiChosenWord = wordy.chooseWord();
+				for(int i = 0; i<aiChosenWord.length();i++){
+					curRevealedChars.add('*');
+				}
+			}
+			else{
+				aiChosenWord = null;
+				for(boolean isValid = false;!isValid;){
+					try{
+						playerChosenWordLength = Integer.parseInt(demandUserInput(18,Project3.sysScnr));
+						isValid = true;
+					}
+					catch(NumberFormatException e){
+						System.out.println(localization.get(16));
+						isValid = false;
+					}
+				}
+				for(int i = 0; i<playerChosenWordLength;i++){
+					curRevealedChars.add('*');
+				}
+			}
+			updateVarMap();
+			//displayGameStatus();
+
+
 		}
-		finally{
-			//TODO do a thing, like dance.
+		catch(RuntimeException e){
+			throw new RuntimeException("Failed to initialize game.",e);
 		}
 
 	}
 	private static void turn() throws GameOverException{
-		//Display past turn stats
-		//Request new char input
+		displayGameStatus();//Display past turn stats
+		if(curLives == 0){
+			throw new GameOverException("Loss by too many turns.");
+		}
+		String curGuess = new String();
+		if(!aiGuesser){
+			curGuess = demandUserInput(5,Project3.sysScnr);//Request new player input
+		}
+		else{
+			//TODO ai guess logic.
+		}
+		
 		//Update base values based on input
 		//Update derived values based on input
 
-
+		curGuess = null;
 		updateVarMap();//ALWAYS DO AT END
 	}
 
 	public void reset() {
-		// TODO Auto-generated method stub
+
+		curLives = TOTLIVES;
+		numTurns = 0;
+		aiGuesser = false;
+		aiChooser = false;
+		aiChosenWord = null;
+		curCharInput = ' ';
+		curGuessPositions.clear();
+		curRevealedChars.clear();
+		curGuessedChars.clear();
 
 	}
 	private static char demandUserInput(int displayStringIndex, List<Character> possibleChoices, Scanner inScnr){ //Overload for demanding set of inputs
@@ -149,7 +198,7 @@ public class Game {
 					throw e;
 				}
 				catch(InvalidUserInputException e){
-					throw e;
+					throw new InvalidUserInputException(localization.get(15),e);
 				}
 				catch(RuntimeException e){
 					throw new RuntimeException("Unexpected exception while demanding user input.", e );
@@ -293,17 +342,23 @@ public class Game {
 	 * @see Localization code: 0003
 	 * 
 	 */
-	private boolean checkCG(){
+	private static boolean checkCG(){
 		char[] possible = {'c','g'};
 		List<Character> posList = new ArrayList<Character>();
 		for(char c:possible){
 			posList.add(c);
 		}
 		if(demandUserInput(3,posList,Project3.sysScnr)==possible[0]){
+			aiGuesser = true;
+			aiChooser = false;
+			aiChosenWord = null;
 			return true;//TODO make this set the player to chooser and AI to guesser.
 		}
 		else{
-			return false;//TODO make this set the player to guesser and the AI to chooser.
+			aiGuesser = false;
+			aiChooser = true;
+
+			return true;//TODO make this set the player to guesser and the AI to chooser.
 		}
 	}
 	public void checkContinue() throws QuitGameException{
@@ -316,8 +371,13 @@ public class Game {
 	}
 	public static void displayGameStatus(){
 
-		displayLine(10);
-		System.out.println();
+		if(curGuessedChars.size() == 0){
+			displayLine(17);
+		}
+		else{
+			displayLine(10);
+			System.out.println();
+		}
 		if(curLives == TOTLIVES){
 			displayLine(8);
 			System.out.println();

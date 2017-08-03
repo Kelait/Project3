@@ -1,3 +1,6 @@
+#note: order doesn't matter, just no duplicate codes or only the last one will survive.
+
+
 #output lines
 0001,Would you like to play again? (Y/N)
 0002,Word revealed thus far: $revealWord 
@@ -13,6 +16,8 @@
 0012,The guesser has won by finding the word $finalWord before strike # $TOTLIVES .
 0013,The letter $charInput is not in the word -- Strike!
 0014,The guesser has lost by not finding the word before reaching strike # $TOTLIVES .
+0017,No letters guessed yet.
+0018,How many letters are in your chosen word: 
 
 #errors
 0015,Invalid user input detected.
