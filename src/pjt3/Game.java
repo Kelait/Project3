@@ -38,10 +38,15 @@ public class Game {
 			while(in.hasNextLine()){
 
 				String curLine = in.nextLine();
-				String[] curValues = curLine.split("\\s*,\\s*");
-				int curIndex = Integer.parseInt(curValues[0]);
-				localization.put(curIndex, curValues[1]);
-				fileLineNum++;
+				if(curLine.isEmpty()||curLine.startsWith("#")||curLine.trim().isEmpty()){
+					//ignore line
+				}
+				else{
+					String[] curValues = curLine.split("\\s*,\\s*");
+					int curIndex = Integer.parseInt(curValues[0]);
+					localization.put(curIndex, curValues[1]);
+					fileLineNum++;
+				}
 			}
 		}
 		catch(NumberFormatException e){
@@ -256,13 +261,13 @@ public class Game {
 		}
 
 	}
-	public boolean checkYN(){
+	public boolean checkYN(int localIndex){
 		char[] possible = {'y','n'};
 		List<Character> posList = new ArrayList<Character>();
 		for(char c:possible){
 			posList.add(c);
 		}
-		if(demandUserInput(0001,posList,Project3.sysScnr)==possible[0]){
+		if(demandUserInput(localIndex,posList,Project3.sysScnr)==possible[0]){
 			return true;
 		}
 		else{
@@ -285,6 +290,14 @@ public class Game {
 		}
 		else{
 			return false;//TODO make this set the player to guesser and the AI to chooser.
+		}
+	}
+	public void checkContinue() throws QuitGameException{
+		if(checkYN(0001)){
+			//nothing
+		}
+		else{
+			throw new QuitGameException("User designated termination.");
 		}
 	}
 
