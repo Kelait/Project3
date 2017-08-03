@@ -6,27 +6,34 @@ public class Game {
 
 	public static final int SEED = 777;
 
-	public static HashMap<Integer, String> localization = new HashMap<Integer,String>();
+	private static final int TOTLIVES = 10;
 	
-	public static HashMap<String, Object> localizationVarMap = new HashMap<String, Object>();
+	private static HashMap<Integer, String> localization = new HashMap<Integer,String>();
+
+	private static HashMap<String, Object> localizationVarMap = new HashMap<String, Object>();
 
 	private static Random randy;
 
 	private static WordGenerator wordy;
-	
+
 	private static String curLanguage = "eng";
-	
-	private static int curWordLength
-	
-	public static ArrayList<Character> curRevealedChars = new ArrayList<Character>(curWordLength);
-	
+
+	private static int curWordLength;
+	private static int curLives;
+	private static char curCharInput;
+
+
+	private static ArrayList<Integer> curGuessPositions = new ArrayList<Integer>();
+	private static ArrayList<Character> curRevealedChars = new ArrayList<Character>(curWordLength);
+	private static ArrayList<Character> curGuessedChars = new ArrayList<Character>(curWordLength);
+
 	private static void readInLocalization(){
 		Scanner in = null;
 		int fileLineNum = 1;
 		try{
 			in = new Scanner(new FileReader(curLanguage + "Local.txt"));
 			while(in.hasNextLine()){
-				
+
 				String curLine = in.nextLine();
 				String[] curValues = curLine.split("\\s*,\\s*");
 				int curIndex = Integer.parseInt(curValues[0]);
@@ -51,7 +58,7 @@ public class Game {
 		try{
 			randy = new Random(SEED);
 			wordy = new WordGenerator(randy);
-			readInLocalization();
+			readInLocalization();				
 			initGame();
 			run();
 		}
@@ -72,7 +79,7 @@ public class Game {
 		catch(GameOverException e){
 			//TODO something something end game.
 		}
-	
+
 	}
 	private static void initPlayers(){
 
@@ -85,15 +92,21 @@ public class Game {
 		finally{
 			//TODO do a thing, like dance.
 		}
-	
+
 	}
 	private static void turn() throws GameOverException{
-		
+		//Display past turn stats
+		//Request new char input
+		//Update base values based on input
+		//Update derived values based on input
+
+
+		updateVarMap();//ALWAYS DO AT END
 	}
 
 	public void reset() {
 		// TODO Auto-generated method stub
-		
+
 	}
 	private static String demandUserInput(int displayStringIndex, ArrayList<String> possibleChoices, Scanner inScnr){
 		for(boolean isInput = false; !isInput;){
@@ -109,7 +122,7 @@ public class Game {
 					}
 					isInput = true;
 					return sendString;
-					
+
 				}
 				catch(NullPointerException e){
 					throw new UserInputNotFoundException("No input detected.", e);
@@ -130,11 +143,28 @@ public class Game {
 		}
 		return null;
 	}
-	
+
 	private static void updateVarMap(){
-		
+		String tempRevealWord = "";
+		for(Character c: curRevealedChars){
+			tempRevealWord += c + " ";
+		}
+		String tempGuessChars = "";
+		for(Character c: curGuessedChars){
+			tempGuessChars += c + " ";
+		}
+		String tempGuessPos = "";
+		for(Integer c: curGuessPositions){
+			tempGuessPos += c + " ";
+		}
+		localizationVarMap.put("$revealWord", tempRevealWord);
+		localizationVarMap.put("$guessChars", tempGuessChars );
+		localizationVarMap.put("$guessPositions", tempGuessPos );
+		localizationVarMap.put("$wordLength", new Integer(curWordLength));
+		localizationVarMap.put("$charInput", new Character(curCharInput));
+		localizationVarMap.put("$strikes", new Integer(curLives));
 	}
-	
+
 	public static void displayLine(int inLocalizationIndex){
 		if(!localization.get(inLocalizationIndex).contains("$")){
 			System.out.println(localization.get(inLocalizationIndex) + " ");
@@ -145,10 +175,15 @@ public class Game {
 				String curWord = varScnr.next();
 				if(curWord.charAt(0)=='$'){
 					try{
-						
+						System.out.print(localizationVarMap.get(curWord) + " ");
+					}
+					catch(Exception e){
+						e.printStackTrace();//something bad dun gone wrong
 					}
 				}
-				System.out.print(curWord + " ");
+				else{
+					System.out.print(curWord + " ");
+				}
 			}
 		}
 	}
@@ -161,7 +196,7 @@ public class Game {
 		else{
 			//Do nothing.
 		}
-		
+
 	}
 
 }

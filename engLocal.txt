@@ -1,5 +1,2 @@
 0001,Would you like to play again? (Y/N)
 0002,Word revealed thus far: $revealWord 
-0003,
-0004,
-0005,

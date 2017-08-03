@@ -12,7 +12,6 @@ public class Project3 {
 		try{
 			while(true){//Repeat
 				gamey = new Game();
-				gamey.reset();
 				gamey.checkContinue();
 			}
 		}
@@ -23,9 +22,9 @@ public class Project3 {
 			try{
 				System.out.println("Exception encountered, terminating program.");
 				PrintWriter exceptionLogger = new PrintWriter("log.txt");
-				exceptionLogger.print(e.getStackTrace());
-				System.exit(0); 
+				e.printStackTrace(exceptionLogger);
 				exceptionLogger.close();
+				System.exit(0); 
 			}
 			catch(FileNotFoundException e1){
 				//you dun goofed.
