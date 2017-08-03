@@ -26,8 +26,8 @@ public class Project3 {
 				exceptionLogger.close();
 				System.exit(0); 
 			}
-			catch(FileNotFoundException e1){
-				//you dun goofed.
+			catch(Exception e1){
+				//Everything is now broken.
 			}
 		}
 		finally{
