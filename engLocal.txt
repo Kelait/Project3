@@ -7,7 +7,7 @@
 0006,Letters guessed so far: $guessChars
 0007,The letter $charInput is at positions: $guessPositions
 0008,No strikes yet -- all $TOTLIVES still remaining.
-0009,Guesser currently has $strikes ( $lives to go until automatic loss)
+0009,Guesser currently has $strikes strikes ( $lives to go until automatic loss)
 0010,The computer chooses the letter $charInput for its turn.
 0011,Enter locations that computer's guess appears in your word (0 if none):
 0012,The guesser has won by finding the word $finalWord before strike # $TOTLIVES .

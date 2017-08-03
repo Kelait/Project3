@@ -26,6 +26,9 @@ public class Game {
 	//Shouldn't change honestly, would need more language support if language were to change.
 	private static String curLanguage = "eng";
 
+
+	private static boolean aiGuesser;
+
 	//Vars for output display.
 	private static int curWordLength;
 	private static int curLives;
@@ -73,6 +76,7 @@ public class Game {
 			randy = new Random(SEED);
 			wordy = new WordGenerator(randy);
 			readInLocalization();				
+			displayGameStatus();
 			initGame();
 			run();
 		}
@@ -130,7 +134,7 @@ public class Game {
 
 					String sendString = inScnr.nextLine();
 					if(sendString==null||sendString.length()<1){
-						throw new UserInputNotFoundException(localization.get(0016));
+						throw new UserInputNotFoundException(localization.get(16));
 					}
 					if(checkFirstChar(possibleChoices, sendString)){
 						isInput = true;
@@ -139,7 +143,7 @@ public class Game {
 
 				}
 				catch(NullPointerException e){
-					throw new UserInputNotFoundException(localization.get(0016), e);
+					throw new UserInputNotFoundException(localization.get(16), e);
 				}
 				catch(UserInputNotFoundException e){
 					throw e;
@@ -168,14 +172,14 @@ public class Game {
 
 					String sendString = inScnr.nextLine();
 					if(sendString==null||sendString.length()<1){
-						throw new UserInputNotFoundException(localization.get(0016));
+						throw new UserInputNotFoundException(localization.get(16));
 					}
 					isInput = true;
 					return sendString;
 
 				}
 				catch(NullPointerException e){
-					throw new UserInputNotFoundException(localization.get(0016), e);
+					throw new UserInputNotFoundException(localization.get(16), e);
 				}
 				catch(UserInputNotFoundException e){
 					throw e;
@@ -257,7 +261,7 @@ public class Game {
 			}catch(RuntimeException e){
 				throw new RuntimeException("Error in displaying a line.", e);
 			}
-			
+
 		}
 
 	}
@@ -267,7 +271,7 @@ public class Game {
 			return true;
 		}
 		else{
-			throw new InvalidUserInputException(localization.get(0016));
+			throw new InvalidUserInputException(localization.get(16));
 		}
 
 	}
@@ -295,7 +299,7 @@ public class Game {
 		for(char c:possible){
 			posList.add(c);
 		}
-		if(demandUserInput(0003,posList,Project3.sysScnr)==possible[0]){
+		if(demandUserInput(3,posList,Project3.sysScnr)==possible[0]){
 			return true;//TODO make this set the player to chooser and AI to guesser.
 		}
 		else{
@@ -303,12 +307,28 @@ public class Game {
 		}
 	}
 	public void checkContinue() throws QuitGameException{
-		if(checkYN(0001)){
+		if(checkYN(1)){
 			//nothing
 		}
 		else{
 			throw new QuitGameException("User designated termination.");
 		}
 	}
+	public static void displayGameStatus(){
 
+		displayLine(10);
+		System.out.println();
+		if(curLives == TOTLIVES){
+			displayLine(8);
+			System.out.println();
+		}
+		else{
+			displayLine(9);
+			System.out.println();
+		}
+		displayLine(2);
+		System.out.println();
+
+	}
 }
+
