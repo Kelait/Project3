@@ -66,4 +66,8 @@ public class WordGenerator{
 	public ArrayList<String> getWords(){
 		return words;
 	}
+	
+	public void cullWordList(/*Probably some args here */){
+		//TODO cull word list based on args.
+	}
 }

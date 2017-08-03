@@ -1,3 +1,4 @@
+#output lines
 0001,Would you like to play again? (Y/N)
 0002,Word revealed thus far: $revealWord 
 0003,Do you wish to be the [C]hooser or the [G]uesser?

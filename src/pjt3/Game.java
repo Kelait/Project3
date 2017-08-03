@@ -17,15 +17,21 @@ public class Game {
 
 	private static Random randy;
 
+	/**
+	 * Dictionary words come from this.
+	 * @see WordGenerator.java
+	 */
 	private static WordGenerator wordy;
 
+	//Shouldn't change honestly, would need more language support if language were to change.
 	private static String curLanguage = "eng";
 
+	//Vars for output display.
 	private static int curWordLength;
 	private static int curLives;
 	private static char curCharInput;
 
-
+	//Arrays for output display.
 	private static ArrayList<Integer> curGuessPositions = new ArrayList<Integer>();
 	private static ArrayList<Character> curRevealedChars = new ArrayList<Character>(curWordLength);
 	private static ArrayList<Character> curGuessedChars = new ArrayList<Character>(curWordLength);
@@ -174,9 +180,6 @@ public class Game {
 				catch(UserInputNotFoundException e){
 					throw e;
 				}
-				catch(InvalidUserInputException e){
-					throw e;
-				}
 				catch(RuntimeException e){
 					throw new RuntimeException("Unexpected exception while demanding user input.", e );
 				}
@@ -233,23 +236,30 @@ public class Game {
 			System.out.println(localization.get(inLocalizationIndex) + " ");
 		}
 		else{
-			Scanner varScnr = new Scanner(localization.get(inLocalizationIndex));
-			while(varScnr.hasNext()){
-				String curWord = varScnr.next();
-				if(curWord.startsWith("$")){
-					try{
-						System.out.print(localizationVarMap.get(curWord) + " ");
+			Scanner varScnr;
+			try{
+				varScnr = new Scanner(localization.get(inLocalizationIndex));
+				while(varScnr.hasNext()){
+					String curWord = varScnr.next();
+					if(curWord.startsWith("$")){
+						try{
+							System.out.print(localizationVarMap.get(curWord) + " ");
+						}
+						catch(RuntimeException e){
+							throw e;//something bad gone wrong
+						}
 					}
-					catch(RuntimeException e){
-						throw e;//something bad gone wrong
+					else{
+						System.out.print(curWord + " ");
 					}
 				}
-				else{
-					System.out.print(curWord + " ");
-				}
+				varScnr.close();
+			}catch(RuntimeException e){
+				throw new RuntimeException("Error in displaying a line.", e);
 			}
-			varScnr.close();
+			
 		}
+
 	}
 	public static boolean checkFirstChar(List<Character> availChars, String inString) throws InvalidUserInputException {
 		char temp = Character.toLowerCase(inString.charAt(0));
@@ -261,7 +271,7 @@ public class Game {
 		}
 
 	}
-	public boolean checkYN(int localIndex){
+	private boolean checkYN(int localIndex){
 		char[] possible = {'y','n'};
 		List<Character> posList = new ArrayList<Character>();
 		for(char c:possible){
@@ -279,7 +289,7 @@ public class Game {
 	 * @see Localization code: 0003
 	 * 
 	 */
-	public boolean checkCG(){
+	private boolean checkCG(){
 		char[] possible = {'c','g'};
 		List<Character> posList = new ArrayList<Character>();
 		for(char c:possible){
