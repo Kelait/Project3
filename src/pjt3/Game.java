@@ -7,12 +7,18 @@ public class Game {
 	public static final int SEED = 777;
 
 	public static HashMap<Integer, String> localization = new HashMap<Integer,String>();
+	
+	public static HashMap<String, Object> localizationVarMap = new HashMap<String, Object>();
 
 	private static Random randy;
 
 	private static WordGenerator wordy;
 	
 	private static String curLanguage = "eng";
+	
+	private static int curWordLength
+	
+	public static ArrayList<Character> curRevealedChars = new ArrayList<Character>(curWordLength);
 	
 	private static void readInLocalization(){
 		Scanner in = null;
@@ -41,7 +47,7 @@ public class Game {
 			in.close();
 		}
 	}
-	Game() throws RuntimeException, GameOverException{
+	Game() throws RuntimeException{
 		try{
 			randy = new Random(SEED);
 			wordy = new WordGenerator(randy);
@@ -56,7 +62,7 @@ public class Game {
 			throw new RuntimeException("Exception encountered while constructing game.", e);
 		}
 	}
-	private static void run() throws GameOverException{
+	private static void run(){
 		try{
 			while(true){
 				//TODO Game logic.
@@ -82,18 +88,18 @@ public class Game {
 	
 	}
 	private static void turn() throws GameOverException{
-
+		
 	}
 
 	public void reset() {
 		// TODO Auto-generated method stub
 		
 	}
-	private static String demandUserInput(String displayString, ArrayList<String> possibleChoices, Scanner inScnr){
+	private static String demandUserInput(int displayStringIndex, ArrayList<String> possibleChoices, Scanner inScnr){
 		for(boolean isInput = false; !isInput;){
 			try{
 				try{
-					System.out.print(displayString + " ");
+					displayLine(displayStringIndex);
 					String sendString = inScnr.nextLine();
 					if(sendString.length()<1||sendString==null){
 						throw new UserInputNotFoundException("No input detected.");
@@ -124,10 +130,32 @@ public class Game {
 		}
 		return null;
 	}
+	
+	private static void updateVarMap(){
+		
+	}
+	
+	public static void displayLine(int inLocalizationIndex){
+		if(!localization.get(inLocalizationIndex).contains("$")){
+			System.out.println(localization.get(inLocalizationIndex) + " ");
+		}
+		else{
+			Scanner varScnr = new Scanner(localization.get(inLocalizationIndex));
+			while(varScnr.hasNext()){
+				String curWord = varScnr.next();
+				if(curWord.charAt(0)=='$'){
+					try{
+						
+					}
+				}
+				System.out.print(curWord + " ");
+			}
+		}
+	}
 	public void checkContinue() throws QuitGameException {
 		String[] aAvail = {"y","n","Y","N","Yes","No","yes","no"};
 		ArrayList<String> avail = new ArrayList<String>(Arrays.asList(aAvail));
-		if(demandUserInput(localization.get(0001),avail,Project3.sysScnr).charAt(0)=='y'){
+		if(demandUserInput(0001,avail,Project3.sysScnr).charAt(0)=='y'){
 			throw new QuitGameException("Exiting game by user input.");
 		}
 		else{
