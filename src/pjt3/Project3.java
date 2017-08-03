@@ -20,7 +20,7 @@ public class Project3 {
 		}
 		catch(Exception e){	//Capt'n, we have a problem.
 			try{
-				System.out.println("Exception encountered, terminating program.");
+				System.out.println("Unrecoverable error encountered, terminating program. Check log.txt for more information.");
 				PrintWriter exceptionLogger = new PrintWriter("log.txt");
 				e.printStackTrace(exceptionLogger);
 				exceptionLogger.close();

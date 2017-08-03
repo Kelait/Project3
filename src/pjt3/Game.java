@@ -2,12 +2,15 @@ package pjt3;
 import java.io.*;
 import java.util.*;
 
+
 public class Game {
+
+
 
 	public static final int SEED = 777;
 
 	private static final int TOTLIVES = 10;
-	
+
 	private static HashMap<Integer, String> localization = new HashMap<Integer,String>();
 
 	private static HashMap<String, Object> localizationVarMap = new HashMap<String, Object>();
@@ -108,24 +111,27 @@ public class Game {
 		// TODO Auto-generated method stub
 
 	}
-	private static String demandUserInput(int displayStringIndex, ArrayList<String> possibleChoices, Scanner inScnr){
+	private static char demandUserInput(int displayStringIndex, List<Character> possibleChoices, Scanner inScnr){ //Overload for demanding set of inputs
 		for(boolean isInput = false; !isInput;){
 			try{
 				try{
 					displayLine(displayStringIndex);
+
 					String sendString = inScnr.nextLine();
-					if(sendString.length()<1||sendString==null){
-						throw new UserInputNotFoundException("No input detected.");
+					if(sendString==null||sendString.length()<1){
+						throw new UserInputNotFoundException(localization.get(0016));
 					}
-					if(!possibleChoices.contains(sendString)){
-						throw new InvalidUserInputException("Invalid input detected.");
+					if(checkFirstChar(possibleChoices, sendString)){
+						isInput = true;
+						return sendString.charAt(0);
 					}
-					isInput = true;
-					return sendString;
 
 				}
 				catch(NullPointerException e){
-					throw new UserInputNotFoundException("No input detected.", e);
+					throw new UserInputNotFoundException(localization.get(0016), e);
+				}
+				catch(UserInputNotFoundException e){
+					throw e;
 				}
 				catch(InvalidUserInputException e){
 					throw e;
@@ -141,6 +147,42 @@ public class Game {
 				e.printStackTrace();
 			}
 		}
+		return ' ';
+	}
+	private static String demandUserInput(int displayStringIndex, Scanner inScnr){ //Overload for demanding any input.
+		for(boolean isInput = false; !isInput;){
+			try{
+				try{
+					displayLine(displayStringIndex);
+
+					String sendString = inScnr.nextLine();
+					if(sendString==null||sendString.length()<1){
+						throw new UserInputNotFoundException(localization.get(0016));
+					}
+					isInput = true;
+					return sendString;
+
+				}
+				catch(NullPointerException e){
+					throw new UserInputNotFoundException(localization.get(0016), e);
+				}
+				catch(UserInputNotFoundException e){
+					throw e;
+				}
+				catch(InvalidUserInputException e){
+					throw e;
+				}
+				catch(RuntimeException e){
+					throw new RuntimeException("Unexpected exception while demanding user input.", e );
+				}
+			}
+			catch(InvalidUserInputException e){
+				System.out.println(e.getMessage());
+			}
+			catch(RuntimeException e){
+				throw new RuntimeException("Error in demanding input.", e);
+			}
+		}
 		return null;
 	}
 
@@ -153,18 +195,34 @@ public class Game {
 		for(Character c: curGuessedChars){
 			tempGuessChars += c + " ";
 		}
-		String tempGuessPos = "";
-		for(Integer c: curGuessPositions){
-			tempGuessPos += c + " ";
+		String tempCharInput = "";
+		tempCharInput += "'"+curCharInput+"'";
+
+		String tempFinalWord = "";
+		tempFinalWord += "'";
+		for(Character c: curRevealedChars){
+			tempFinalWord += c;
 		}
+		tempFinalWord += "'";
+		//		String tempGuessPos = "";
+		//		for(Integer c: curGuessPositions){
+		//			tempGuessPos += c + " ";
+		//		}
 		localizationVarMap.put("$revealWord", tempRevealWord);
 		localizationVarMap.put("$guessChars", tempGuessChars );
-		localizationVarMap.put("$guessPositions", tempGuessPos );
+		localizationVarMap.put("$guessPositions", curGuessPositions );
 		localizationVarMap.put("$wordLength", new Integer(curWordLength));
-		localizationVarMap.put("$charInput", new Character(curCharInput));
-		localizationVarMap.put("$strikes", new Integer(curLives));
-	}
+		localizationVarMap.put("$charInput", tempCharInput);
+		localizationVarMap.put("$lives", new Integer(curLives));
+		localizationVarMap.put("$strikes", new Integer(TOTLIVES-curLives));
+		localizationVarMap.put("$TOTLIVES", new Integer(TOTLIVES));
+		localizationVarMap.put("$finalWord", tempFinalWord);
 
+	}
+	/**
+	 * Displays a line taken from the file with the name equivalent to curLanguage+Local.txt
+	 * @param inLocalizationIndex
+	 */
 	public static void displayLine(int inLocalizationIndex){
 		if(!localization.get(inLocalizationIndex).contains("$")){
 			System.out.println(localization.get(inLocalizationIndex) + " ");
@@ -177,26 +235,57 @@ public class Game {
 					try{
 						System.out.print(localizationVarMap.get(curWord) + " ");
 					}
-					catch(Exception e){
-						e.printStackTrace();//something bad dun gone wrong
+					catch(RuntimeException e){
+						throw e;//something bad dun gone wrong
 					}
 				}
 				else{
 					System.out.print(curWord + " ");
 				}
 			}
+			varScnr.close();
 		}
 	}
-	public void checkContinue() throws QuitGameException {
-		String[] aAvail = {"y","n","Y","N","Yes","No","yes","no"};
-		ArrayList<String> avail = new ArrayList<String>(Arrays.asList(aAvail));
-		if(demandUserInput(0001,avail,Project3.sysScnr).charAt(0)=='y'){
-			throw new QuitGameException("Exiting game by user input.");
+	public static boolean checkFirstChar(List<Character> availChars, String inString) throws InvalidUserInputException {
+		char temp = Character.toLowerCase(inString.charAt(0));
+		if(availChars.contains(temp)){
+			return true;
 		}
 		else{
-			//Do nothing.
+			throw new InvalidUserInputException(localization.get(0016));
 		}
 
+	}
+	public boolean checkYN(){
+		char[] possible = {'y','n'};
+		List<Character> posList = new ArrayList<Character>();
+		for(char c:possible){
+			posList.add(c);
+		}
+		if(demandUserInput(0001,posList,Project3.sysScnr)==possible[0]){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	/**
+	 * Sets the player and ai based on player input. 
+	 * @see Localization code: 0003
+	 * 
+	 */
+	public boolean checkCG(){
+		char[] possible = {'c','g'};
+		List<Character> posList = new ArrayList<Character>();
+		for(char c:possible){
+			posList.add(c);
+		}
+		if(demandUserInput(0003,posList,Project3.sysScnr)==possible[0]){
+			return true;//TODO make this set the player to chooser and AI to guesser.
+		}
+		else{
+			return false;//TODO make this set the player to guesser and the AI to chooser.
+		}
 	}
 
 }

@@ -1,2 +1,17 @@
 0001,Would you like to play again? (Y/N)
 0002,Word revealed thus far: $revealWord 
+0003,Do you wish to be the [C]hooser or the [G]uesser?
+0004,No Letters guessed yet.
+0005,Enter a letter:
+0006,Letters guessed so far: $guessChars
+0007,The letter $charInput is at positions: $guessPositions
+0008,No strikes yet -- all $TOTLIVES still remaining.
+0009,Guesser currently has $strikes ( $lives to go until automatic loss)
+0010,The computer chooses the letter $charInput for its turn.
+0011,Enter locations that computer's guess appears in your word (0 if none):
+0012,The guesser has won by finding the word $finalWord before strike # $TOTLIVES .
+0013,The letter $charInput is not in the word -- Strike!
+0014,The guesser has lost by not finding the word before reaching strike # $TOTLIVES .
+
+0015,Invalid user input detected.
+0016,No user input detected.
