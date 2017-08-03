@@ -13,5 +13,6 @@
 0013,The letter $charInput is not in the word -- Strike!
 0014,The guesser has lost by not finding the word before reaching strike # $TOTLIVES .
 
+#errors
 0015,Invalid user input detected.
 0016,No user input detected.

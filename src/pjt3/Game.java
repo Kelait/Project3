@@ -236,12 +236,12 @@ public class Game {
 			Scanner varScnr = new Scanner(localization.get(inLocalizationIndex));
 			while(varScnr.hasNext()){
 				String curWord = varScnr.next();
-				if(curWord.charAt(0)=='$'){
+				if(curWord.startsWith("$")){
 					try{
 						System.out.print(localizationVarMap.get(curWord) + " ");
 					}
 					catch(RuntimeException e){
-						throw e;//something bad dun gone wrong
+						throw e;//something bad gone wrong
 					}
 				}
 				else{
