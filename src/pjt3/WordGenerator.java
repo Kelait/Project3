@@ -21,7 +21,7 @@ public class WordGenerator{
 
 	}
 	WordGenerator() throws IOException{
-		this(new Random(Game.SEED));
+		this(new Random(Project3.SEED));
 	}
 	/**
 	 * Generates list of words from file given by the file at directory defined by WORDLIST.
@@ -71,6 +71,7 @@ public class WordGenerator{
 		//TODO cull word list based on args.
 	}
 	public String chooseWord() {
-		return words.get(wordRand.nextInt(words.size()));
+		return words.get(wordRand.nextInt(words.size())).toUpperCase();
 	}
+	
 }

@@ -7,15 +7,28 @@ public class Game {
 
 
 
-	public static final int SEED = 777;
+	public static final double TOLERANCE = 0.00001;
 
 	private static final int TOTLIVES = 10;
 
-	private static HashMap<Integer, String> localization = new HashMap<Integer,String>();
+	private static final double[] LETTERPROB = {	8.167, 1.492, 2.782, 4.253, 
+			12.702, 2.228,2.015,6.094,6.966,0.153,
+			0.770,4.025,2.406,6.749,7.507,1.929,0.095,
+			5.987,6.327,9.056,2.758,0.978,2.630,0.150,
+			1.974,0.074};
 
+	private static final char[] LETTERSOFALPHABET = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+			'i', 'j','k','l','m','n','o',
+			'p','q','r','s','t','u','v',
+			'w','x','y','z'};
+	private static double[] cumLetterProb = new double[LETTERPROB.length];
+
+	//private static HashMap<Double,Character> probabiltyMap = new HashMap<Double>
+
+
+	private static HashMap<Integer, String> localization = new HashMap<Integer,String>();
 	private static HashMap<String, Object> localizationVarMap = new HashMap<String, Object>();
 
-	private static Random randy;
 
 	/**
 	 * Dictionary words come from this.
@@ -29,16 +42,18 @@ public class Game {
 	//Global game vars.
 	private static boolean aiGuesser;
 	private static boolean aiChooser;
+	private static boolean isStrike;
 
 	private static String aiChosenWord;
-	private static int playerChosenWordLength;
 
 	private static int numTurns;	
+	private static int correctGuesses;
 
 	//Vars for output display and gameplay.
 	private static int curWordLength;
 	private static int curLives;
 	private static char curCharInput;
+
 
 	//Arrays for output display and gameplay.
 	private static ArrayList<Integer> curGuessPositions = new ArrayList<Integer>();
@@ -53,7 +68,7 @@ public class Game {
 			while(in.hasNextLine()){
 
 				String curLine = in.nextLine();
-				if(curLine.isEmpty()||curLine.startsWith("#")||curLine.trim().isEmpty()){
+				if(curLine.isEmpty()||curLine.startsWith("@")||curLine.trim().isEmpty()){
 					//ignore line
 				}
 				else{
@@ -78,9 +93,15 @@ public class Game {
 		}
 	}
 	Game() throws RuntimeException{
+
 		try{
-			randy = new Random(SEED);
-			wordy = new WordGenerator(randy);
+			wordy = new WordGenerator(Project3.randy);
+			seedCumLetterProb();
+			//			for(int i = 0; i<cumLetterProb.length;i++){
+			//				System.out.print(cumLetterProb[i] + " " + LETTERSOFALPHABET[i] + " ");
+			//			}
+			//			System.out.println();
+			//			System.out.println(chooseAIMove(wordy.getWords()));
 			readInLocalization();				
 			initGame();
 			run();
@@ -96,12 +117,16 @@ public class Game {
 	private static void run(){
 		try{
 			while(true){
-				//TODO Game logic.
+
 				turn();
+				updateVarMap();//ALWAYS DO 
+				curCharInput = ' ';
 			}
 		}
 		catch(GameOverException e){
-			//TODO something something end game.
+			System.out.println();
+			displayLine(Integer.parseInt(e.getMessage()));
+			System.out.println();
 		}
 
 	}
@@ -112,15 +137,17 @@ public class Game {
 			checkCG();
 			if(aiChooser){
 				aiChosenWord = wordy.chooseWord();
-				for(int i = 0; i<aiChosenWord.length();i++){
+				curWordLength = aiChosenWord.length();
+				for(int i = 0; i<curWordLength;i++){
 					curRevealedChars.add('*');
 				}
+				//System.out.println(aiChosenWord);
 			}
 			else{
 				aiChosenWord = null;
 				for(boolean isValid = false;!isValid;){
 					try{
-						playerChosenWordLength = Integer.parseInt(demandUserInput(18,Project3.sysScnr));
+						curWordLength = Integer.parseInt(demandUserInput(18,Project3.sysScnr));
 						isValid = true;
 					}
 					catch(NumberFormatException e){
@@ -128,7 +155,7 @@ public class Game {
 						isValid = false;
 					}
 				}
-				for(int i = 0; i<playerChosenWordLength;i++){
+				for(int i = 0; i<curWordLength;i++){
 					curRevealedChars.add('*');
 				}
 			}
@@ -143,28 +170,114 @@ public class Game {
 
 	}
 	private static void turn() throws GameOverException{
-		displayGameStatus();//Display past turn stats
 		if(curLives == 0){
-			throw new GameOverException("Loss by too many turns.");
+			throw new GameOverException("14");
 		}
-		String curGuess = new String();
+		//System.out.println(correctGuesses);
+		System.out.println();
+		displayGameStatus();//Display past turn stats
+
+
+		if(correctGuesses == curWordLength){
+			throw new GameOverException("12");
+		}
 		if(!aiGuesser){
-			curGuess = demandUserInput(5,Project3.sysScnr);//Request new player input
+			curCharInput = Character.toUpperCase(demandUserInput(5,Project3.sysScnr).charAt(0));//Request new player input
+
+			if(aiChosenWord.indexOf(curCharInput)==-1){
+				curGuessedChars.add(Character.toLowerCase(curCharInput));
+				strike();
+			}
+			else{
+				for(int i = 0; i<curWordLength;i++){
+					if(aiChosenWord.charAt(i)==curCharInput){
+						if(!curGuessedChars.contains(Character.toUpperCase(curCharInput))){
+							correctGuesses++;
+						}
+						curRevealedChars.remove(i);
+						curRevealedChars.add(i, curCharInput);
+						//curGuessedChars.add(curCharInput);
+						curGuessPositions.add((Integer)i);
+
+					}
+				}
+				curGuessedChars.add(Character.toUpperCase(curCharInput));
+			}
 		}
 		else{
-			//TODO ai guess logic.
+			for(boolean isValid = false; !isValid;){//TODO lots of input validation.
+				curCharInput = chooseAIMove(wordy.getWords()).charAt(0);
+
+				if(curGuessedChars.contains(Character.toUpperCase(curCharInput))||curGuessedChars.contains(Character.toLowerCase(curCharInput))){
+					isValid = false;
+				}
+				else{
+					isValid = true;
+				}
+			}
+			updateVarMap();
+			displayLine(10);
+			System.out.println();
+			
+			String inString = demandUserInput(11,Project3.sysScnr);//TODO input valid try catch.
+			int curPos;
+			Scanner tempScan = new Scanner(inString);
+			while(tempScan.hasNext()){
+				curPos = Integer.parseInt(tempScan.next());
+				if(curPos != 0){
+					correctGuesses++;
+					curGuessedChars.add(Character.toUpperCase(curCharInput));
+					curRevealedChars.remove(curPos-1);
+					curRevealedChars.add(curPos-1, Character.toUpperCase(curCharInput));
+				}
+				else{
+					curGuessedChars.add(Character.toLowerCase(curCharInput));
+					strike();
+				}
+			}
+			curPos = 0;
 		}
-		
 		//Update base values based on input
 		//Update derived values based on input
 
-		curGuess = null;
-		updateVarMap();//ALWAYS DO AT END
+		numTurns++;
+
 	}
 
+	private static String chooseAIMove(ArrayList<String> words) {
+
+		double probGuess = Project3.randy.nextDouble()*100;
+		double former=0;
+		double later=0;
+		//		int curIndex=0;
+		//		System.out.println(probGuess);
+		for(int i = 0; i<LETTERPROB.length;i++){
+			if(i!=LETTERPROB.length-1){
+				later = cumLetterProb[i+1];
+			}
+			else{
+				later = 100;
+			}
+			former = cumLetterProb[i];
+			//			curIndex = i;
+			if(probGuess>former&&probGuess<later){
+				//				System.out.println("Returning " + LETTERSOFALPHABET[i]);//test
+				return Character.toString(LETTERSOFALPHABET[i]);
+			}
+		}
+		return Character.toString('e');
+
+
+	}
+	private static void strike() {
+		curLives--;
+		isStrike = true;
+
+	}
 	public void reset() {
 
 		curLives = TOTLIVES;
+		correctGuesses = 0;
 		numTurns = 0;
 		aiGuesser = false;
 		aiChooser = false;
@@ -276,7 +389,7 @@ public class Game {
 		localizationVarMap.put("$charInput", tempCharInput);
 		localizationVarMap.put("$lives", new Integer(curLives));
 		localizationVarMap.put("$strikes", new Integer(TOTLIVES-curLives));
-		localizationVarMap.put("$TOTLIVES", new Integer(TOTLIVES));
+		localizationVarMap.put("$totLives", new Integer(TOTLIVES));
 		localizationVarMap.put("$finalWord", tempFinalWord);
 
 	}
@@ -352,13 +465,13 @@ public class Game {
 			aiGuesser = true;
 			aiChooser = false;
 			aiChosenWord = null;
-			return true;//TODO make this set the player to chooser and AI to guesser.
+			return true;
 		}
 		else{
 			aiGuesser = false;
 			aiChooser = true;
 
-			return true;//TODO make this set the player to guesser and the AI to chooser.
+			return true;
 		}
 	}
 	public void checkContinue() throws QuitGameException{
@@ -375,7 +488,30 @@ public class Game {
 			displayLine(17);
 		}
 		else{
-			displayLine(10);
+			if(!aiChooser){
+				if(isStrike){
+					displayLine(13);
+					System.out.println();
+					isStrike = false;
+				}
+				else{
+					displayLine(10);
+					System.out.println();
+				}
+			}
+			else{
+				if(isStrike){
+					displayLine(13);
+					System.out.println();
+					isStrike = false;
+				}
+				else{
+					displayLine(7);
+					System.out.println();
+				}
+
+			}
+			displayLine(6);
 			System.out.println();
 		}
 		if(curLives == TOTLIVES){
@@ -388,7 +524,19 @@ public class Game {
 		}
 		displayLine(2);
 		System.out.println();
+		System.out.println();
 
+		curGuessPositions.clear();
 	}
+
+	private static void seedCumLetterProb(){
+		double curSum = 0;
+		for(int i = 0; i< LETTERPROB.length;i++){
+			cumLetterProb[i] = curSum;
+			curSum += LETTERPROB[i];
+		}
+	}
+
+
 }
 

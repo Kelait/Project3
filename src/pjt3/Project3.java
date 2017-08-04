@@ -4,8 +4,10 @@ import java.util.*;
 public class Project3 {
 
 
-	static Scanner sysScnr = new Scanner(System.in);
+	public static final int SEED = 777;
 	
+	public static Scanner sysScnr = new Scanner(System.in);
+	public static Random randy = new Random(SEED);
 	
 	public static void main(String[] args) {
 		Game gamey;
