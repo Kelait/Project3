@@ -35,7 +35,7 @@ public class Game {
 	private static boolean isStrike;
 
 	private static String aiChosenWord;
-	private static String playerChosenWord;//only set after game over, check validity of player inputs.
+	private static String playerChosenWord = "";//only set after game over, check validity of player inputs.
 
 	private static int numTurns;	
 	private static int correctGuesses;
@@ -122,7 +122,7 @@ public class Game {
 			displayLine(Integer.parseInt(e.getMessage()));
 			System.out.println();
 
-			if(curLives == 0){
+			if(curLives == 0&&!aiChooser){
 				if(endValidate()){
 					//is valid, unknown word
 					//System.out.println("check");
@@ -131,6 +131,10 @@ public class Game {
 					//endUser is tosser
 					//System.out.println("no check");
 				}
+			}
+			else if(curLives == 0&&aiChooser){
+				displayLine(32);
+				System.out.println();
 			}
 
 		}
@@ -154,7 +158,7 @@ public class Game {
 	}
 	private static boolean endValidate() {
 		playerChosenWord = demandUserInput(29,Project3.sysScnr).toUpperCase().replaceAll("\\s", "");
-		System.out.println(playerChosenWord);
+//		System.out.println(playerChosenWord);
 		if(playerChosenWord.length()!= curWordLength){
 
 			displayLine(28);
@@ -411,7 +415,7 @@ public class Game {
 		numTurns = 0;
 		aiGuesser = false;
 		aiChooser = false;
-		aiChosenWord = null;
+		aiChosenWord = "";
 		curCharInput = ' ';
 		curGuessPositions.clear();
 		curRevealedChars.clear();
@@ -515,6 +519,8 @@ public class Game {
 		//		for(Integer c: curGuessPositions){
 		//			tempGuessPos += c + " ";
 		//		}
+		String tempAIWord = "";
+		tempAIWord+=aiChosenWord;
 		localizationVarMap.put("$revealWord", tempRevealWord);
 		localizationVarMap.put("$guessChars", tempGuessChars );
 		localizationVarMap.put("$guessPositions", curGuessPositions );
@@ -525,6 +531,7 @@ public class Game {
 		localizationVarMap.put("$totLives", new Integer(TOTLIVES));
 		localizationVarMap.put("$finalWord", tempFinalWord);
 		localizationVarMap.put("$inconsistGuess", new Character(failChar));
+		localizationVarMap.put("$aiWord", new String(tempAIWord));
 
 	}
 	/**
@@ -599,7 +606,7 @@ public class Game {
 		if(temp==possible[0]){
 			aiGuesser = true;
 			aiChooser = false;
-			aiChosenWord = null;
+			aiChosenWord = "";
 			return true;
 		}
 		else{

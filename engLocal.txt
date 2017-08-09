@@ -19,6 +19,7 @@
 0017^No letters guessed yet.
 0018^How many letters are in your chosen word: 
 0029^The Chooser should reveal their word now:
+0032^The computer had chosen the word $aiWord .
 
 
 @errors
