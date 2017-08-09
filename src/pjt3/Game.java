@@ -140,6 +140,7 @@ public class Game {
 		}
 		catch(InvalidUserInputException e){
 			displayLine(30);
+			System.out.println();
 			if(endValidate()){
 				//is valid, unknown word
 				//System.out.println("check");
