@@ -2,11 +2,18 @@ package pjt3;
 import java.io.*;
 import java.util.*;
 
-
+/**
+ * New instance created every time game to be replayed. Also, only one instance should be active at a time.
+ * @author Collin Patteson, Joong Ho Kim
+ *
+ */
 public class Game {
 
 
-
+	/**
+	 * Never actually used, useless.
+	 * @deprecated
+	 */
 	public static final double TOLERANCE = 0.00001;
 
 	private static final int TOTLIVES = 10;
@@ -36,7 +43,9 @@ public class Game {
 
 	private static String aiChosenWord;
 	private static String playerChosenWord = "";//only set after game over, check validity of player inputs.
-
+	/**
+	 * @deprecated
+	 */
 	private static int numTurns;	
 	private static int correctGuesses;
 
@@ -53,7 +62,9 @@ public class Game {
 
 	private static boolean isReed = false;
 	private static char failChar = ' ';
-
+	/**
+	 * Fills localization hashmap with strings from <lang>Local.
+	 */
 	private static void readInLocalization(){
 		Scanner in = null;
 		int fileLineNum = 1;
@@ -86,6 +97,10 @@ public class Game {
 			in.close();
 		}
 	}
+	/**
+	 * Only purpose exists in being created.
+	 * @throws RuntimeException
+	 */
 	Game() throws RuntimeException{
 
 		try{
@@ -108,6 +123,10 @@ public class Game {
 			throw new RuntimeException("Exception encountered while constructing game.", e);
 		}
 	}
+	/**
+	 * Loop for game turns.
+	 * @throws RuntimeException
+	 */
 	private static void run() throws RuntimeException{
 		try{
 			while(true){
@@ -157,9 +176,13 @@ public class Game {
 		}
 
 	}
+	/**
+	 * 
+	 * @return true if word player inputed was consistent with input, false otherwise.
+	 */
 	private static boolean endValidate() {
 		playerChosenWord = demandUserInput(29,Project3.sysScnr).toUpperCase().replaceAll("\\s", "");
-//		System.out.println(playerChosenWord);
+		//		System.out.println(playerChosenWord);
 		if(playerChosenWord.length()!= curWordLength){
 
 			displayLine(28);
@@ -182,6 +205,9 @@ public class Game {
 		}
 		return true;
 	}
+	/**
+	 * Does things that should only happen at the start of a new game.
+	 */
 	private static void initGame(){
 		try{
 			curLives = TOTLIVES;
@@ -230,6 +256,12 @@ public class Game {
 		}
 
 	}
+	/**
+	 * Handles each turn of the game.
+	 * @throws RuntimeException
+	 * @throws GameOverException
+	 * @throws InvalidUserInputException
+	 */
 	private static void turn() throws RuntimeException, GameOverException, InvalidUserInputException{
 		try{
 			//updateVarMap();
@@ -379,7 +411,11 @@ public class Game {
 			throw new RuntimeException("Exception thrown in turn().",e);
 		}
 	}
-
+	/**
+	 * Randomly picks a letter based on the probability of remaining letters in the dictionary.
+	 * @param words Of possible words.
+	 * @return String of the chosen letter. --Honestly should be char.
+	 */
 	private static String chooseAIMove(ArrayList<String> words) {
 
 		double probGuess = Project3.randy.nextDouble()*100;
@@ -405,11 +441,17 @@ public class Game {
 
 
 	}
+	/**
+	 * Does what it says on the tin, adds a strike.
+	 */
 	private static void strike() {
 		curLives--;
 		isStrike = true;
 
 	}
+	/**
+	 * Does what is says on the tin, resets game vars.
+	 */
 	public void reset() {
 
 		curLives = TOTLIVES;
@@ -424,6 +466,13 @@ public class Game {
 		curGuessedChars.clear();
 
 	}
+	/**
+	 * Requests player input based on set number of possible choices.
+	 * @param displayStringIndex Index in <lang>Local which contains the desired prompt index.
+	 * @param possibleChoices A list which contains all the possible returns. 
+	 * @param inScnr System scanner.
+	 * @return char based on user input.
+	 */
 	private static char demandUserInput(int displayStringIndex, List<Character> possibleChoices, Scanner inScnr){ //Overload for demanding set of inputs
 		for(boolean isInput = false; !isInput;){
 			try{
@@ -462,6 +511,12 @@ public class Game {
 		}
 		return ' ';
 	}
+	/**
+	 * Demands user input for any possible input.
+	 * @param displayStringIndex Index in <lang>Local which is the index for the desired output line.
+	 * @param inScnr System scanner.
+	 * @return String of what ever the user inputed into the console.
+	 */
 	private static String demandUserInput(int displayStringIndex, Scanner inScnr){ //Overload for demanding any input.
 		for(boolean isInput = false; !isInput;){
 			try{
@@ -498,7 +553,9 @@ public class Game {
 		}
 		return null;
 	}
-
+	/**
+	 * Keeps the Localization hashmap up to date with the latest variables.
+	 */
 	private static void updateVarMap(){
 		String tempRevealWord = "";
 		for(Character c: curRevealedChars){
@@ -537,8 +594,8 @@ public class Game {
 
 	}
 	/**
-	 * Displays a line taken from the file with the name equivalent to curLanguage+Local.txt
-	 * @param inLocalizationIndex
+	 * Displays a line taken from the file with the name equivalent to <lang>Local.txt
+	 * @param inLocalizationIndex Integer found in preceding a line in <lang>Local.txt
 	 */
 	public static void displayLine(int inLocalizationIndex){
 		if(!localization.get(inLocalizationIndex).contains("$")){
@@ -570,6 +627,13 @@ public class Game {
 		}
 
 	}
+	/**
+	 * Probably depreciated, to remove maybe one day.
+	 * @param availChars
+	 * @param inString
+	 * @return
+	 * @throws InvalidUserInputException
+	 */
 	public static boolean checkFirstChar(List<Character> availChars, String inString) throws InvalidUserInputException {
 		char temp = Character.toLowerCase(inString.charAt(0));
 		if(availChars.contains(temp)){
@@ -580,6 +644,11 @@ public class Game {
 		}
 
 	}
+	/**
+	 * Checks yes or no.
+	 * @param localIndex
+	 * @return true if yes, false if no.
+	 */
 	private boolean checkYN(int localIndex){
 		char[] possible = {'y','n'};
 		List<Character> posList = new ArrayList<Character>();
@@ -618,6 +687,10 @@ public class Game {
 			return true;
 		}
 	}
+	/**
+	 * Just invokes checkYN.
+	 * @throws QuitGameException
+	 */
 	public void checkContinue() throws QuitGameException{
 		if(checkYN(1)){
 			//nothing
@@ -626,6 +699,9 @@ public class Game {
 			throw new QuitGameException("User designated termination.");
 		}
 	}
+	/**
+	 * Displayes the collective status of the game on the current turn, invoked at start of every turn.
+	 */
 	public static void displayGameStatus(){
 
 		if(curGuessedChars.size() == 0){
