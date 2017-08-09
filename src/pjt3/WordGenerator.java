@@ -143,7 +143,7 @@ public class WordGenerator{
 //		}
 //	}
 	public void updateWordVars(){
-		System.out.println(words.size());
+//		System.out.println(words.size());
 		totLetters = 0;
 		letterProb = new double[LETTERSOFALPHABET.length];
 		cumLetterProb = new double[LETTERSOFALPHABET.length];
