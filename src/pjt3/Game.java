@@ -163,6 +163,7 @@ public class Game {
 		if(playerChosenWord.length()!= curWordLength){
 
 			displayLine(28);
+			System.out.println();
 			return false;
 		}
 		for(Character c:curGuessedChars){
