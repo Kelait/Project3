@@ -21,9 +21,9 @@ public class WordGenerator{
 	private static int totLetters;
 
 	private ArrayList<String> iKnowWords_IHaveTheBestWords = new ArrayList<String>(); //He has such a way with words.
-	private ArrayList<String> words = iKnowWords_IHaveTheBestWords;
+	private ArrayList<String> words;
 
-	private static final String WORDLIST = "words.txt";
+	public static final String WORDLIST = "words.txt";
 
 	private Random wordRand = null;
 
@@ -51,9 +51,10 @@ public class WordGenerator{
 		try{
 			in = new Scanner(new FileReader(WORDLIST));
 			while(in.hasNext()){
-				words.add(in.next());
+				iKnowWords_IHaveTheBestWords.add(in.next());
 			}
-
+			words = new ArrayList<String>(iKnowWords_IHaveTheBestWords);
+			
 		}
 		catch(FileNotFoundException e){
 			throw new IOException("Failed to seed words.",e);
@@ -166,5 +167,7 @@ public class WordGenerator{
 			curSum += letterProb[i];
 		}
 	}
-
+	public ArrayList<String> getiKnowWords_IHaveTheBestWords() {
+		return iKnowWords_IHaveTheBestWords;
+	}
 }

@@ -50,9 +50,9 @@ public class Game {
 	private static int correctGuesses;
 
 	//Vars for output display and gameplay.
-	private static int curWordLength;
-	private static int curLives;
-	private static char curCharInput;
+	private static int curWordLength = 0;
+	private static int curLives = 0;
+	private static char curCharInput = 0;
 
 
 	//Arrays for output display and gameplay.
@@ -126,8 +126,9 @@ public class Game {
 	/**
 	 * Loop for game turns.
 	 * @throws RuntimeException
+	 * @throws IOException 
 	 */
-	private static void run() throws RuntimeException{
+	private static void run() throws RuntimeException, IOException{
 		try{
 			while(true){
 
@@ -179,8 +180,9 @@ public class Game {
 	/**
 	 * 
 	 * @return true if word player inputed was consistent with input, false otherwise.
+	 * @throws IOException 
 	 */
-	private static boolean endValidate() {
+	private static boolean endValidate() throws IOException {
 		playerChosenWord = demandUserInput(29,Project3.sysScnr).toUpperCase().replaceAll("\\s", "");
 		//		System.out.println(playerChosenWord);
 		if(playerChosenWord.length()!= curWordLength){
@@ -189,21 +191,57 @@ public class Game {
 			System.out.println();
 			return false;
 		}
+		List<Character> tempCharList = new ArrayList<Character>();
+		for(char c:playerChosenWord.toCharArray()){
+			tempCharList.add(c);
+		}
 		for(Character c:curGuessedChars){
-			if(Character.isLowerCase(c)&&(Arrays.binarySearch(playerChosenWord.toCharArray(),Character.toUpperCase(c))>=0)){
+
+			//			System.out.println(tempCharList);
+			if(Character.isLowerCase(c)&&(tempCharList.contains(Character.toUpperCase(c)))){
+				//				System.out.println('1');
 				failChar = c;
 				updateVarMap();
 				displayLine(27);
+				System.out.println();
 				return false;
 			}
-			else if(Character.isUpperCase(c)&&(Arrays.binarySearch(playerChosenWord.toCharArray(),Character.toUpperCase(c))<0)){	
+			else if(Character.isUpperCase(c)&&(!(tempCharList.contains(Character.toUpperCase(c))))){	
+				//				System.out.println('2');
 				failChar = c;
 				updateVarMap();
 				displayLine(27);
+				System.out.println();
 				return false;
 			}
 		}
+		addToWords(playerChosenWord.toLowerCase());
 		return true;
+	}
+	/**
+	 * Adds unknown word to dictionary for future.
+	 * @param lowerCase
+	 * @throws IOException 
+	 */
+	private static void addToWords(String lowerCase) throws IOException {
+		try
+		{
+			if(!wordy.getiKnowWords_IHaveTheBestWords().contains(lowerCase)){
+				FileWriter fw = new FileWriter(WordGenerator.WORDLIST,true); //append new data
+				fw.write("\n"+lowerCase);//appends the string to the file
+				fw.close();
+				displayLine(33);
+				System.out.println();
+			}
+			else{
+				//word already known
+			}
+		}
+		catch(IOException e)
+		{
+			throw new IOException("Failed to find wordlist file.",e);
+		}
+
 	}
 	/**
 	 * Does things that should only happen at the start of a new game.
@@ -275,6 +313,12 @@ public class Game {
 			if(wordy.getWords().size()<=0){
 				throw new InvalidUserInputException("Inconsistent input or unknown word.");
 			}
+			if(wordy.getWords().size()==1&&(curRevealedChars.contains('*'))){
+				throw new InvalidUserInputException("Inconsistent input or unknown word.");
+			}
+//			if(wordy.getWords().size()<=10){ //test 
+//				System.out.println(wordy.getWords());
+//			}
 
 			if(correctGuesses == curWordLength){
 				throw new GameOverException("12");
@@ -337,30 +381,32 @@ public class Game {
 						isReed = false;
 						int curPos = -1;
 						Scanner tempScan = new Scanner(inString);
-						String tempPosList = "";
+						List<String> tempPosList = new ArrayList<String>();
 						while(tempScan.hasNext()){
-							tempPosList+=tempScan.next();
+							tempPosList.add(tempScan.next());
 						}
 						int tempMax = -1;
-						for(int i = 0;i<tempPosList.length();i++){
-							if((Integer.parseInt(Character.toString(tempPosList.charAt(i)))==0)
-									&&(Integer.parseInt(Character.toString(tempPosList.charAt(i)))==tempPosList.length()-1)
-									&&(tempPosList.length()!=1)){
+						for(int i = 0;i<tempPosList.size();i++){
+
+							if((Integer.parseInt((tempPosList.get(i)))==0)
+									&&(Integer.parseInt((tempPosList.get(i)))==tempPosList.size()-1)
+									&&(tempPosList.size()!=1)){
 								throw new InvalidUserInputException(localization.get(23));
 							}
-							if(Integer.parseInt(Character.toString(tempPosList.charAt(i)))<tempMax){
+							if(Integer.parseInt((tempPosList.get(i)))<tempMax){
 								throw new InvalidUserInputException(localization.get(22));
 							}
 
-							tempMax = Integer.parseInt(Character.toString(tempPosList.charAt(i)));
+							tempMax = Integer.parseInt((tempPosList.get(i)));
 						}
 						tempScan.close();
-						for(int b = 0;b<tempPosList.length();b++){
-
-							curPos = Integer.parseInt(Character.toString(tempPosList.charAt(b)));
+						for(int b = 0;b<tempPosList.size();b++){
+							curPos = Integer.parseInt((tempPosList.get(b)));
 
 							if(curPos<0||curPos>29){
-								throw new InvalidUserInputException(localization.get(24));
+								displayLine(24);
+								System.out.println();
+								throw new InvalidUserInputException();
 							}
 
 							for(Integer i:curGuessPositions){
@@ -368,8 +414,16 @@ public class Game {
 									throw new InvalidUserInputException(localization.get(22));
 								}
 							}
-							if(curPos != 0){
+							if(curPos>curWordLength){
+								displayLine(24);
+								System.out.println();
+								throw new InvalidUserInputException();
+							}
 
+							if(curPos != 0){
+								if(!curRevealedChars.get(curPos-1).equals('*')){
+									throw new InvalidUserInputException(localization.get(34));
+								}
 								correctGuesses++;
 								if(!(curGuessedChars.contains(Character.toUpperCase(curCharInput)))){
 									curGuessedChars.add(Character.toUpperCase(curCharInput));
@@ -398,7 +452,9 @@ public class Game {
 						System.out.println(localization.get(26));
 					}
 					catch(InvalidUserInputException e){
-						System.out.println(e.getMessage());
+						if(e.getMessage()!=null){
+							System.out.println(e.getMessage());
+						}
 					}
 				}
 			}
@@ -506,7 +562,7 @@ public class Game {
 				//System.out.println(e.getMessage());
 			}
 			catch(RuntimeException e){
-				e.printStackTrace();
+				throw new RuntimeException("Error in demanding input.", e);
 			}
 		}
 		return ' ';
@@ -656,9 +712,11 @@ public class Game {
 			posList.add(c);
 		}
 		if(demandUserInput(localIndex,posList,Project3.sysScnr)==possible[0]){
+			System.out.println();
 			return true;
 		}
 		else{
+			System.out.println();
 			return false;
 		}
 	}

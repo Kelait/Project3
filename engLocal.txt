@@ -20,6 +20,7 @@
 0018^How many letters are in your chosen word: 
 0029^The Chooser should reveal their word now:
 0032^The computer had chosen the word $aiWord .
+0033^That word has been added to the dictionary for future games.
 
 
 @errors
@@ -30,10 +31,11 @@
 0021^You must enter at least one number, try again.
 0022^Positions must be entered in increasing order, try again.
 0023^There should be no entries after a 0.
-0024^Numbers must be in the range of 0 to 29, the word length.
+0024^Numbers must be in the range of 0 to $wordLength , the word length.
 0025^You entered an already known position, try again.
 0026^All entries must be integers, try again.
 0027^Your statement on my guess ' $inconsistGuess ' is not consistent with your reported solution.
 0028^That does not match the length you stated at the start of the game.
 0030^The computer does not know your word.
 0031^You must enter an alphabetical letter.
+0034^You entered a position already known, try again.
